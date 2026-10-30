@@ -3,15 +3,17 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CYS VA 視藝科色彩輔助平台 (12色專屬對接版)</title>
+  <title>CYS VA 視藝科色彩輔助平台 (學生自訂顏料版)</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
     body { background-color: #f3f4f6; color: #1f2937; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
     header { background-color: #1e3a8a; color: white; padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
     header h1 { font-size: 1.2rem; font-weight: 600; }
     
-    .upload-btn { background-color: #3b82f6; color: white; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 0.95rem; display: inline-flex; align-items: center; gap: 6px; }
-    .upload-btn:hover { background-color: #2563eb; }
+    .upload-group { display: flex; gap: 10px; }
+    .upload-btn { background-color: #3b82f6; color: white; padding: 8px 14px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 0.9rem; display: inline-flex; align-items: center; gap: 5px; }
+    .upload-btn.secondary { background-color: #059669; }
+    .upload-btn:hover { opacity: 0.9; }
     input[type="file"] { display: none; }
 
     main { display: flex; flex: 1; padding: 15px; gap: 15px; overflow: hidden; }
@@ -38,40 +40,49 @@
 
     .sidebar { flex: 1; display: flex; flex-direction: column; gap: 15px; min-width: 340px; }
     .card { background: white; border-radius: 12px; padding: 15px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
-    .card h2 { font-size: 1rem; color: #374151; margin-bottom: 10px; border-bottom: 2px solid #e5e7eb; padding-bottom: 6px; }
+    .card h2 { font-size: 1rem; color: #374151; margin-bottom: 10px; border-bottom: 2px solid #e5e7eb; padding-bottom: 6px; display: flex; justify-content: space-between; align-items: center; }
 
-    .palette-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-bottom: 5px; }
-    .palette-badge { display: flex; align-items: center; gap: 6px; padding: 4px 6px; background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 6px; font-size: 0.8rem; font-weight: bold; }
-    .badge-code { background: #1e3a8a; color: white; padding: 1px 5px; border-radius: 4px; font-family: monospace; }
-    .badge-swatch { width: 14px; height: 14px; border-radius: 50%; border: 1px solid #9ca3af; flex-shrink: 0; }
+    .palette-grid { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 5px; }
+    .palette-badge { display: flex; align-items: center; gap: 6px; padding: 4px 8px; background: #f3f4f6; border: 1px solid #d1d5db; border-radius: 6px; font-weight: bold; font-size: 0.85rem; }
+    .badge-code { background: #1e3a8a; color: white; padding: 2px 6px; border-radius: 4px; font-family: monospace; }
+    .badge-swatch { width: 16px; height: 16px; border-radius: 50%; border: 1px solid #9ca3af; }
 
     .sampled-color-box { display: flex; align-items: center; gap: 15px; margin-bottom: 10px; }
     .color-swatch { width: 50px; height: 50px; border-radius: 8px; border: 2px solid #374151; box-shadow: inset 0 2px 4px rgba(0,0,0,0.2); }
     .drops-list { display: flex; flex-direction: column; gap: 6px; flex: 1; }
-    .drop-item { display: flex; align-items: center; gap: 8px; font-size: 0.95rem; font-weight: bold; }
-    .code-tag { background: #1e3a8a; color: white; padding: 2px 8px; border-radius: 4px; font-family: monospace; font-size: 0.9rem; }
+    .drop-item { display: flex; align-items: center; gap: 8px; font-size: 1rem; font-weight: bold; }
+    .code-tag { background: #1e3a8a; color: white; padding: 2px 8px; border-radius: 4px; font-family: monospace; font-size: 0.95rem; }
 
-    .steps-container { display: flex; flex-direction: column; gap: 8px; max-height: calc(100vh - 430px); overflow-y: auto; }
+    .steps-container { display: flex; flex-direction: column; gap: 8px; max-height: calc(100vh - 380px); overflow-y: auto; }
     .step-row { display: flex; align-items: center; gap: 10px; padding: 8px; background: #f9fafb; border-radius: 8px; border: 1px solid #e5e7eb; }
     .step-num { font-weight: 800; font-size: 1.1rem; width: 28px; height: 28px; background: #1e3a8a; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
     .step-swatch { width: 36px; height: 36px; border-radius: 6px; border: 1px solid #d1d5db; flex-shrink: 0; }
-    .step-recipe { font-size: 0.85rem; font-weight: bold; color: #374151; flex: 1; }
+    .step-recipe { font-size: 0.9rem; font-weight: bold; color: #374151; flex: 1; }
+
+    .setup-banner { background: #dbeafe; color: #1e40af; padding: 8px 12px; border-radius: 6px; font-size: 0.85rem; font-weight: bold; margin-bottom: 8px; border: 1px solid #bfdbfe; display: flex; justify-content: space-between; align-items: center; }
+    .reset-btn { background: #ef4444; color: white; border: none; padding: 2px 8px; border-radius: 4px; cursor: pointer; font-size: 0.75rem; }
   </style>
 </head>
 <body>
 
   <header>
-    <h1>🎨 CYS VA 視藝科色彩輔助平台 (12色專屬對接版)</h1>
-    <label class="upload-btn">
-      📷 上傳寫生目標圖
-      <input type="file" id="imageLoader" accept="image/*">
-    </label>
+    <h1>🎨 CYS VA 視藝科色彩輔助平台 (學生自訂顏料對接版)</h1>
+    <div class="upload-group">
+      <label class="upload-btn secondary">
+        🎨 1. 上傳個人顏料照片
+        <input type="file" id="paletteLoader" accept="image/*">
+      </label>
+      <label class="upload-btn">
+        📷 2. 上傳寫生目標圖
+        <input type="file" id="imageLoader" accept="image/*">
+      </label>
+    </div>
   </header>
 
   <main>
     <div class="viewport-container">
       <div class="controls-bar">
-        <span>模式：</span>
+        <span id="currentViewTag" style="font-weight: bold; color: #059669;">請先上傳顏料相片並註冊代號</span>
         <button class="mode-btn active" id="btnOriginal">原圖</button>
         <button class="mode-btn" id="btnPosterize">灰階等高線</button>
         <span style="margin-left: 10px;">縮放：</span>
@@ -95,15 +106,19 @@
         </div>
       </div>
 
-      <p style="font-size: 0.85rem; color: #6b7280; margin-top: 8px; text-align: center;">
-        💡 提示：點擊圖片任意位置取色，系統會自動對照 1 至 12 號顏料管輸出調色配方！
+      <p style="font-size: 0.85rem; color: #6b7280; margin-top: 8px; text-align: center;" id="tipText">
+        💡 提示：上傳顏料盒相片後，在相片上順序點擊你的顏料，為它們加上代號！
       </p>
     </div>
 
     <div class="sidebar">
-      <!-- 12 色顏料庫列表 -->
+      <!-- 學生專屬顏料庫對照卡 -->
       <div class="card">
-        <h2>🎨 課堂 12 色顏料編號對照庫</h2>
+        <h2>
+          🎨 學生個人顏料庫註冊
+          <button class="reset-btn" id="btnResetPalette">重新註冊</button>
+        </h2>
+        <div class="setup-banner" id="setupStatus">請上傳你的顏料相片開始註冊</div>
         <div class="palette-grid" id="paletteGrid"></div>
       </div>
 
@@ -112,19 +127,20 @@
         <div class="sampled-color-box">
           <div class="color-swatch" id="sampleSwatch" style="background-color: #e5e7eb;"></div>
           <div class="drops-list" id="sampleRecipe">
-            <span style="color: #6b7280;">請上傳圖片並點擊任意位置...</span>
+            <span style="color: #6b7280;">請完成顏料註冊並上傳寫生圖...</span>
           </div>
         </div>
       </div>
 
       <div class="card" style="flex: 1;">
-        <h2>📊 全圖主流色彩卡 (代號版)</h2>
+        <h2>📊 全圖主流色彩卡 (個人代號版)</h2>
         <div class="steps-container" id="stepsContainer"></div>
       </div>
     </div>
   </main>
 
   <script>
+    const paletteLoader = document.getElementById('paletteLoader');
     const imageLoader = document.getElementById('imageLoader');
     const wrapper = document.getElementById('canvasWrapper');
     const transformLayer = document.getElementById('canvasTransformLayer');
@@ -135,46 +151,56 @@
     const stepsContainer = document.getElementById('stepsContainer');
     const stepCountSelect = document.getElementById('stepCount');
     const paletteGrid = document.getElementById('paletteGrid');
+    const currentViewTag = document.getElementById('currentViewTag');
+    const setupStatus = document.getElementById('setupStatus');
+    const tipText = document.getElementById('tipText');
+    const btnResetPalette = document.getElementById('btnResetPalette');
 
     let isPosterized = false;
-    let originalImageData = null;
+    let paletteImageData = null;
+    let targetImageData = null;
+    let viewMode = 'PALETTE'; // 'PALETTE' 或 'TARGET'
 
     let scale = 1, panX = 0, panY = 0;
     let isDragging = false, startX, startY, dragMoved = false;
     let selectedPoint = null;
 
-    // 根據標註圖第 1 至 12 號顏料設定精準參數
-    const userPalette = [
-      { code: '①號', name: '檸檬黃', r: 245, g: 220, b: 0 },
-      { code: '②號', name: '橘紅',   r: 240, g: 90,  b: 20 },
-      { code: '③號', name: '大紅',   r: 220, g: 30,  b: 30 },
-      { code: '④號', name: '深紅',   r: 160, g: 10,  b: 30 },
-      { code: '⑤號', name: '赭石',   r: 150, g: 75,  b: 35 },
-      { code: '⑥號', name: '熟褐',   r: 80,  g: 45,  b: 30 },
-      { code: '⑦號', name: '翠綠',   r: 35,  g: 170, b: 70 },
-      { code: '⑧號', name: '墨綠',   r: 0,   g: 120, b: 90 },
-      { code: '⑨號', name: '湖藍',   r: 0,   g: 150, b: 210 },
-      { code: '⑩號', name: '酞青藍', r: 10,  g: 50,  b: 150 },
-      { code: '⑪號', name: '煤黑',   r: 20,  g: 20,  b: 20 },
-      { code: '⑫號', name: '鈦白',   r: 250, g: 250, b: 250 }
-    ];
+    // 學生自訂顏料庫
+    let userPalette = [];
+    const codeAlphabet = ['A號', 'B號', 'C號', 'D號', 'E號', 'F號', 'G號', 'H號', 'I號', 'J號', 'K號', 'L號'];
 
     function renderPaletteUI() {
       paletteGrid.innerHTML = '';
+      if (userPalette.length === 0) {
+        paletteGrid.innerHTML = '<span style="color:#6b7280; font-size:0.85rem;">尚未註冊顏料</span>';
+        return;
+      }
       userPalette.forEach(p => {
         let badge = document.createElement('div');
         badge.className = 'palette-badge';
         badge.innerHTML = `
           <span class="badge-code">${p.code}</span>
           <span class="badge-swatch" style="background-color: rgb(${p.r},${p.g},${p.b});"></span>
-          <span>${p.name}</span>
         `;
         paletteGrid.appendChild(badge);
       });
     }
-    renderPaletteUI();
 
-    imageLoader.addEventListener('change', (e) => {
+    btnResetPalette.addEventListener('click', () => {
+      userPalette = [];
+      renderPaletteUI();
+      if (paletteImageData) {
+        viewMode = 'PALETTE';
+        currentViewTag.innerText = '正在註冊顏料相片';
+        setupStatus.innerText = `請點擊相片中的第 1 支顏料，註冊為【A號】`;
+        ctx.putImageData(paletteImageData, 0, 0);
+      } else {
+        setupStatus.innerText = '請上傳你的顏料相片開始註冊';
+      }
+    });
+
+    // 1. 上傳個人顏料照片
+    paletteLoader.addEventListener('change', (e) => {
       const file = e.target.files[0];
       if (!file) return;
       const reader = new FileReader();
@@ -184,10 +210,42 @@
           canvas.width = img.width;
           canvas.height = img.height;
           ctx.drawImage(img, 0, 0);
-          originalImageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+          paletteImageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+          viewMode = 'PALETTE';
+          userPalette = [];
+          renderPaletteUI();
+          currentViewTag.innerText = '🔍 視口：學生顏料相片 (點擊顏色進行註冊)';
+          setupStatus.innerText = `👈 請點擊相片中【第 1 支顏料】的顏色，註冊為 A號`;
+          tipText.innerText = '💡 每點擊一次顏料管上的顏色，就會自動新增一個專屬代號 (A, B, C...)！';
+          resetZoomFit();
+        };
+        img.src = event.target.result;
+      };
+      reader.readAsDataURL(file);
+    });
+
+    // 2. 上傳寫生目標圖
+    imageLoader.addEventListener('change', (e) => {
+      if (userPalette.length === 0) {
+        alert('請先上傳顏料相片並至少點擊註冊 1 支顏料！');
+        return;
+      }
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const img = new Image();
+        img.onload = () => {
+          canvas.width = img.width;
+          canvas.height = img.height;
+          ctx.drawImage(img, 0, 0);
+          targetImageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+          viewMode = 'TARGET';
+          currentViewTag.innerText = '🎨 視口：寫生目標圖 (取色對接中)';
+          tipText.innerText = '💡 點擊目標圖任意位置，平台會根據你註冊的顏料代號輸出調色配方！';
           selectedPoint = null;
           redrawCanvas();
-          analyzeColorsFromImageData(originalImageData);
+          analyzeColorsFromImageData(targetImageData);
           resetZoomFit();
         };
         img.src = event.target.result;
@@ -196,14 +254,16 @@
     });
 
     function redrawCanvas() {
-      if (!originalImageData) return;
-      if (isPosterized) {
+      const activeData = viewMode === 'TARGET' ? targetImageData : paletteImageData;
+      if (!activeData) return;
+
+      if (viewMode === 'TARGET' && isPosterized) {
         renderPosterized();
       } else {
-        ctx.putImageData(originalImageData, 0, 0);
+        ctx.putImageData(activeData, 0, 0);
       }
       
-      if (selectedPoint) {
+      if (selectedPoint && viewMode === 'TARGET') {
         ctx.save();
         ctx.strokeStyle = '#ef4444';
         ctx.lineWidth = Math.max(3, Math.round(canvas.width / 180));
@@ -255,24 +315,37 @@
 
     window.addEventListener('mouseup', () => { isDragging = false; });
 
+    // 點擊畫布事件
     canvas.addEventListener('click', (e) => {
-      if (dragMoved || !originalImageData) return;
+      if (dragMoved) return;
       const rect = canvas.getBoundingClientRect();
       const x = Math.floor((e.clientX - rect.left) * (canvas.width / rect.width));
       const y = Math.floor((e.clientY - rect.top) * (canvas.height / rect.height));
 
       if (x < 0 || x >= canvas.width || y < 0 || y >= canvas.height) return;
 
-      selectedPoint = { x, y };
-      redrawCanvas();
+      const activeData = viewMode === 'TARGET' ? targetImageData : paletteImageData;
+      if (!activeData) return;
 
       const index = (y * canvas.width + x) * 4;
-      const r = originalImageData.data[index];
-      const g = originalImageData.data[index+1];
-      const b = originalImageData.data[index+2];
+      const r = activeData.data[index];
+      const g = activeData.data[index+1];
+      const b = activeData.data[index+2];
 
-      sampleSwatch.style.backgroundColor = `rgb(${r},${g},${b})`;
-      sampleRecipe.innerHTML = calculatePaletteDrops(r, g, b);
+      if (viewMode === 'PALETTE') {
+        // 註冊顏料色
+        let nextCode = codeAlphabet[userPalette.length] || `P${userPalette.length+1}號`;
+        userPalette.push({ code: nextCode, r, g, b });
+        renderPaletteUI();
+        let followingCode = codeAlphabet[userPalette.length] || `P${userPalette.length+1}號`;
+        setupStatus.innerText = `✅ 已註冊 ${nextCode}！可繼續點擊下一支註冊【${followingCode}】`;
+      } else {
+        // 目標圖取色
+        selectedPoint = { x, y };
+        redrawCanvas();
+        sampleSwatch.style.backgroundColor = `rgb(${r},${g},${b})`;
+        sampleRecipe.innerHTML = calculatePaletteDrops(r, g, b);
+      }
     });
 
     document.getElementById('btnOriginal').addEventListener('click', (e) => {
@@ -285,7 +358,7 @@
 
     stepCountSelect.addEventListener('change', () => {
       redrawCanvas();
-      if (originalImageData) analyzeColorsFromImageData(originalImageData);
+      if (targetImageData) analyzeColorsFromImageData(targetImageData);
     });
 
     function setActiveMode(activeBtn) {
@@ -294,10 +367,10 @@
     }
 
     function renderPosterized() {
-      if (!originalImageData) return;
+      if (!targetImageData) return;
       const K = parseInt(stepCountSelect.value);
-      const imgData = ctx.createImageData(originalImageData);
-      const src = originalImageData.data, dst = imgData.data;
+      const imgData = ctx.createImageData(targetImageData);
+      const src = targetImageData.data, dst = imgData.data;
 
       for (let i = 0; i < src.length; i += 4) {
         let gray = 0.299 * src[i] + 0.587 * src[i+1] + 0.114 * src[i+2];
@@ -308,7 +381,10 @@
       ctx.putImageData(imgData, 0, 0);
     }
 
+    // 將目標色彩對接至學生註冊的個人顏料庫
     function calculatePaletteDrops(targetR, targetG, targetB) {
+      if (!userPalette || userPalette.length === 0) return '請先註冊個人顏料庫';
+
       let closestP = userPalette[0];
       let minDistance = Infinity;
 
@@ -323,12 +399,16 @@
       let brightness = (0.299 * targetR + 0.587 * targetG + 0.114 * targetB) / 255;
       let drops = [];
 
-      drops.push(`<div class="drop-item"><span class="code-tag">${closestP.code}</span> ${closestP.name} 2 滴</div>`);
+      drops.push(`<div class="drop-item"><span class="code-tag">${closestP.code}</span> 顏料 2 滴</div>`);
 
-      if (brightness > 0.65 && closestP.code !== '⑫號') {
-        drops.push(`<div class="drop-item"><span class="code-tag">⑫號</span> 鈦白 2 滴</div>`);
-      } else if (brightness < 0.25 && closestP.code !== '⑪號') {
-        drops.push(`<div class="drop-item"><span class="code-tag">⑪號</span> 煤黑 1 滴</div>`);
+      // 搜尋學生註冊庫中的偏白/偏黑顏料進行明暗調節
+      let whiteP = userPalette.find(p => p.r > 200 && p.g > 200 && p.b > 200);
+      let blackP = userPalette.find(p => p.r < 60 && p.g < 60 && p.b < 60);
+
+      if (brightness > 0.6 && whiteP && whiteP.code !== closestP.code) {
+        drops.push(`<div class="drop-item"><span class="code-tag">${whiteP.code}</span> 顏料 2 滴</div>`);
+      } else if (brightness < 0.25 && blackP && blackP.code !== closestP.code) {
+        drops.push(`<div class="drop-item"><span class="code-tag">${blackP.code}</span> 顏料 1 滴</div>`);
       }
 
       return drops.join('');
