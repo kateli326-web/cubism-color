@@ -2,152 +2,431 @@
 <html lang="zh-HK">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>畢卡索立體主義：情緒色彩填色工具</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CYS VA 視藝科色彩輔助平台 (個人化顏料對接版)</title>
   <style>
-    * { box-sizing: border-box; touch-action: manipulation; }
-    body { font-family: 'PingFang TC', 'Microsoft JhengHei', Arial, sans-serif; text-align: center; background-color: #f0f2f5; margin: 0; padding: 15px; }
-    h1 { color: #1a1a1a; margin-bottom: 5px; font-size: 24px; }
-    p.subtitle { color: #666; margin-top: 0; margin-bottom: 15px; font-size: 14px; }
-    .container { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); max-width: 900px; margin: 0 auto; }
-    .upload-zone { border: 2px dashed #007bff; border-radius: 8px; padding: 20px; background: #f8f9fa; margin-bottom: 15px; }
-    .toolbar-group { display: flex; justify-content: center; align-items: center; gap: 8px; flex-wrap: wrap; margin: 15px 0; }
-    button { padding: 9px 15px; font-size: 14px; font-weight: bold; border-radius: 6px; border: none; cursor: pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-    .btn-danger { background: #dc3545; color: white; }
-    .btn-warning { background: #ffc107; color: black; }
-    .btn-primary { background: #007bff; color: white; }
-    .btn-success { background: #28a745; color: white; }
-    .btn-purple { background: #6f42c1; color: white; }
-    .btn-dark { background: #343a40; color: white; }
-    canvas { border: 2px solid #222; background: #fff; border-radius: 4px; touch-action: none; -webkit-user-select: none; user-select: none; cursor: crosshair; }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    body { background-color: #f3f4f6; color: #1f2937; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+    header { background-color: #1e3a8a; color: white; padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+    header h1 { font-size: 1.2rem; font-weight: 600; }
+    
+    .upload-group { display: flex; gap: 10px; }
+    .upload-btn { background-color: #3b82f6; color: white; padding: 8px 14px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 0.9rem; display: inline-flex; align-items: center; gap: 5px; }
+    .upload-btn.secondary { background-color: #059669; }
+    .upload-btn:hover { opacity: 0.9; }
+    input[type="file"] { display: none; }
+
+    main { display: flex; flex: 1; padding: 15px; gap: 15px; overflow: hidden; }
+
+    .viewport-container { flex: 2; background: white; border-radius: 12px; padding: 15px; display: flex; flex-direction: column; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
+    .controls-bar { display: flex; gap: 8px; margin-bottom: 12px; align-items: center; flex-wrap: wrap; }
+    .mode-btn, .zoom-btn { padding: 6px 12px; border: 1px solid #d1d5db; background: #f9fafb; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.9rem; }
+    .mode-btn.active { background: #2563eb; color: white; border-color: #2563eb; }
+
+    .canvas-wrapper { 
+      flex: 1; 
+      position: relative; 
+      background: #111827; 
+      border-radius: 8px; 
+      overflow: hidden; 
+      cursor: crosshair !important;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    #canvasTransformLayer { position: absolute; transform-origin: center center; display: flex; align-items: center; justify-content: center; }
+    canvas { cursor: crosshair !important; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
+
+    .sidebar { flex: 1; display: flex; flex-direction: column; gap: 15px; min-width: 340px; }
+    .card { background: white; border-radius: 12px; padding: 15px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
+    .card h2 { font-size: 1rem; color: #374151; margin-bottom: 10px; border-bottom: 2px solid #e5e7eb; padding-bottom: 6px; display: flex; justify-content: space-between; align-items: center; }
+
+    /* 學生個人顏料庫卡片 */
+    .palette-grid { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 5px; }
+    .palette-badge { display: flex; align-items: center; gap: 6px; padding: 4px 8px; background: #f3f4f6; border: 1px solid #d1d5db; border-radius: 6px; font-weight: bold; font-size: 0.85rem; }
+    .badge-code { background: #1e3a8a; color: white; padding: 2px 6px; border-radius: 4px; font-family: monospace; }
+    .badge-swatch { width: 16px; height: 16px; border-radius: 50%; border: 1px solid #9ca3af; }
+
+    .sampled-color-box { display: flex; align-items: center; gap: 15px; margin-bottom: 10px; }
+    .color-swatch { width: 50px; height: 50px; border-radius: 8px; border: 2px solid #374151; box-shadow: inset 0 2px 4px rgba(0,0,0,0.2); }
+    .drops-list { display: flex; flex-direction: column; gap: 6px; flex: 1; }
+    .drop-item { display: flex; align-items: center; gap: 8px; font-size: 1rem; font-weight: bold; }
+    .code-tag { background: #1e3a8a; color: white; padding: 2px 8px; border-radius: 4px; font-family: monospace; font-size: 0.95rem; }
+
+    .steps-container { display: flex; flex-direction: column; gap: 8px; max-height: calc(100vh - 380px); overflow-y: auto; }
+    .step-row { display: flex; align-items: center; gap: 10px; padding: 8px; background: #f9fafb; border-radius: 8px; border: 1px solid #e5e7eb; }
+    .step-num { font-weight: 800; font-size: 1.1rem; width: 28px; height: 28px; background: #1e3a8a; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .step-swatch { width: 36px; height: 36px; border-radius: 6px; border: 1px solid #d1d5db; flex-shrink: 0; }
+    .step-recipe { font-size: 0.9rem; font-weight: bold; color: #374151; flex: 1; }
   </style>
 </head>
 <body>
 
-  <div class="container">
-    <h1>🎨 畢卡索立體派：情緒色彩填色工作坊</h1>
-    <p class="subtitle">上傳你在上一階段下載的「步驟五拼貼 JPG」，選擇代表你內心情緒的顏色進行幾何塊面填色！</p>
+  <header>
+    <h1>🎨 CYS VA 視藝科色彩輔助平台 (個人化顏料對接版)</h1>
+    <div class="upload-group">
+      <label class="upload-btn secondary">
+        🎨 1. 上傳個人顏料盒相片
+        <input type="file" id="paletteLoader" accept="image/*">
+      </label>
+      <label class="upload-btn">
+        📷 2. 上傳寫生目標圖
+        <input type="file" id="imageLoader" accept="image/*">
+      </label>
+    </div>
+  </header>
 
-    <!-- 步驟 1：上傳步驟五 JPG -->
-    <div class="upload-zone" id="uploadArea">
-      <h4 style="margin: 0 0 10px 0; color: #007bff;">📥 第一步：請上傳「步驟五拼貼原圖 (JPEG)」</h4>
-      <input type="file" id="imageInput" accept="image/*" onchange="loadImageToCanvas(this)">
+  <main>
+    <div class="viewport-container">
+      <div class="controls-bar">
+        <span>模式：</span>
+        <button class="mode-btn active" id="btnOriginal">原圖</button>
+        <button class="mode-btn" id="btnPosterize">灰階等高線</button>
+        <span style="margin-left: 10px;">縮放：</span>
+        <button class="zoom-btn" id="btnZoomIn">🔍 放大</button>
+        <button class="zoom-btn" id="btnZoomOut">🔍 縮小</button>
+        <button class="zoom-btn" id="btnResetZoom">↺ 還原</button>
+        
+        <div style="margin-left: auto; display: flex; align-items: center; gap: 6px;">
+          <label for="stepCount">提取主色：</label>
+          <select id="stepCount" style="padding: 4px 6px; font-weight: bold;">
+            <option value="3">3 色</option>
+            <option value="4">4 色</option>
+            <option value="5" selected>5 色</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="canvas-wrapper" id="canvasWrapper">
+        <div id="canvasTransformLayer">
+          <canvas id="mainCanvas"></canvas>
+        </div>
+      </div>
+
+      <p style="font-size: 0.85rem; color: #6b7280; margin-top: 8px; text-align: center;">
+        💡 操作步驟：① 先拍照上傳實體顏料盒編號  ② 上傳目標畫作點擊取色，照著代號調色！
+      </p>
     </div>
 
-    <!-- 步驟 2：情緒調色盤 -->
-    <div class="toolbar-group">
-      <span style="font-weight: bold;">選擇情緒色彩：</span>
-      <button type="button" class="btn-danger" onclick="selectEmotionColor('#dc3545', '🔴 憤怒 / 焦慮 / 緊張')">🔴 憤怒/焦慮</button>
-      <button type="button" class="btn-warning" onclick="selectEmotionColor('#ffc107', '🟡 狂熱 / 興奮 / 躁動')">🟡 狂熱/興奮</button>
-      <button type="button" class="btn-primary" onclick="selectEmotionColor('#007bff', '🔵 憂鬱 / 孤獨 / 沉思')">🔵 憂鬱/孤獨</button>
-      <button type="button" class="btn-success" onclick="selectEmotionColor('#28a745', '🟢 嫉妒 / 不安 / 矛盾')">🟢 嫉妒/不安</button>
-      <button type="button" class="btn-purple" onclick="selectEmotionColor('#6f42c1', '🟣 神秘 / 壓抑 / 恐懼')">🟣 神秘/壓抑</button>
-      <button type="button" class="btn-dark" onclick="selectEmotionColor('#ffffff', '⚪ 留白 / 純潔 / 平靜')">⚪ 留白/平靜</button>
-    </div>
+    <div class="sidebar">
+      <!-- 學生個人顏料庫對照卡 -->
+      <div class="card">
+        <h2>🎨 已辨識之個人顏料庫代號</h2>
+        <div class="palette-grid" id="paletteGrid">
+          <span style="font-size: 0.85rem; color: #6b7280;">尚未上傳顏料盒照片 (預設使用標準 5 色)</span>
+        </div>
+      </div>
 
-    <div style="margin-bottom: 12px; font-weight: bold; color: #005ac8;">
-      目前填色模式：<span id="currentEmotionText">🔴 憤怒 / 焦慮 / 緊張 (#dc3545)</span>
-    </div>
+      <div class="card">
+        <h2>📍 點選位置之專屬對接配方</h2>
+        <div class="sampled-color-box">
+          <div class="color-swatch" id="sampleSwatch" style="background-color: #e5e7eb;"></div>
+          <div class="drops-list" id="sampleRecipe">
+            <span style="color: #6b7280;">請點擊左圖任意位置...</span>
+          </div>
+        </div>
+      </div>
 
-    <!-- 填色畫布 -->
-    <div style="display: flex; justify-content: center;">
-      <canvas id="colorCanvas" width="700" height="520"></canvas>
+      <div class="card" style="flex: 1;">
+        <h2>📊 全圖主流色彩卡 (代號版)</h2>
+        <div class="steps-container" id="stepsContainer"></div>
+      </div>
     </div>
-
-    <!-- 下載與 Gemini 跳轉按鈕 -->
-    <div class="toolbar-group" style="margin-top: 20px;">
-      <button class="btn-dark" onclick="clearCanvasColor()">🔄 清空重新填色</button>
-      <button class="btn-success" style="font-size: 16px; padding: 10px 20px;" onclick="downloadColorCanvasJPEG()">📥 下載情緒自畫像 (JPEG)</button>
-    </div>
-  </div>
+  </main>
 
   <script>
-    const canvas = document.getElementById('colorCanvas');
+    const paletteLoader = document.getElementById('paletteLoader');
+    const imageLoader = document.getElementById('imageLoader');
+    const wrapper = document.getElementById('canvasWrapper');
+    const transformLayer = document.getElementById('canvasTransformLayer');
+    const canvas = document.getElementById('mainCanvas');
     const ctx = canvas.getContext('2d');
-    let currentColor = '#dc3545';
-    let loadedImage = null;
+    const sampleSwatch = document.getElementById('sampleSwatch');
+    const sampleRecipe = document.getElementById('sampleRecipe');
+    const stepsContainer = document.getElementById('stepsContainer');
+    const stepCountSelect = document.getElementById('stepCount');
+    const paletteGrid = document.getElementById('paletteGrid');
 
-    // 初始化空白畫布
-    ctx.fillStyle = '#ffffff';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    ctx.fillStyle = '#888888';
-    ctx.font = '18px PingFang TC, sans-serif';
-    ctx.textAlign = 'center';
-    ctx.fillText('請先在上方的藍色區域上傳步驟五拼貼 JPG 檔', canvas.width / 2, canvas.height / 2);
+    let isPosterized = false;
+    let originalImageData = null;
 
-    // 切換情緒顏色
-    function selectEmotionColor(hex, label) {
-      currentColor = hex;
-      document.getElementById('currentEmotionText').innerText = label + " (" + hex + ")";
+    let scale = 1, panX = 0, panY = 0;
+    let isDragging = false, startX, startY, dragMoved = false;
+    let selectedPoint = null;
+
+    // 預設顏料庫代號 (若學生沒拍顏料盒)
+    let userPalette = [
+      { code: 'A號', r: 239, g: 68,  b: 68,  name: '紅' },
+      { code: 'B號', r: 234, g: 179, b: 8,   name: '黃' },
+      { code: 'C號', r: 59,  g: 130, b: 246, name: '藍' },
+      { code: 'D號', r: 255, g: 255, b: 255, name: '白' },
+      { code: 'E號', r: 0,   g: 0,   b: 0,   name: '黑' }
+    ];
+
+    // 更新右側顏料庫代號顯示
+    function renderPaletteUI() {
+      paletteGrid.innerHTML = '';
+      userPalette.forEach(p => {
+        let badge = document.createElement('div');
+        badge.className = 'palette-badge';
+        badge.innerHTML = `
+          <span class="badge-code">${p.code}</span>
+          <span class="badge-swatch" style="background-color: rgb(${p.r},${p.g},${p.b});"></span>
+        `;
+        paletteGrid.appendChild(badge);
+      });
     }
+    renderPaletteUI();
 
-    // 上傳並繪製背景底圖
-    function loadImageToCanvas(input) {
-      if (!input.files || !input.files[0]) return;
-      const file = input.files[0];
+    // 1. 自動辨識學生上傳的顏料盒相片
+    paletteLoader.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
       const reader = new FileReader();
-
-      reader.onload = function(e) {
+      reader.onload = (event) => {
         const img = new Image();
-        img.onload = function() {
-          loadedImage = img;
-          redrawCanvas();
-          document.getElementById('uploadArea').style.display = 'none'; // 隱藏上傳區
+        img.onload = () => {
+          const tempCanvas = document.createElement('canvas');
+          const tCtx = tempCanvas.getContext('2d');
+          tempCanvas.width = img.width;
+          tempCanvas.height = img.height;
+          tCtx.drawImage(img, 0, 0);
+          
+          const imgData = tCtx.getImageData(0, 0, img.width, img.height).data;
+          const extracted = [];
+          const step = Math.floor((imgData.length / 4) / 200) * 4;
+
+          // 提取顏料盒中的顯著色彩
+          for (let i = 0; i < imgData.length; i += step) {
+            let r = imgData[i], g = imgData[i+1], b = imgData[i+2];
+            let isDiff = extracted.every(c => Math.abs(c.r - r) + Math.abs(c.g - g) + Math.abs(c.b - b) > 100);
+            if (isDiff && (r > 40 || g > 40 || b > 40)) {
+              extracted.push({ r, g, b });
+            }
+            if (extracted.length >= 6) break;
+          }
+
+          if (extracted.length > 0) {
+            const labels = ['A號', 'B號', 'C號', 'D號', 'E號', 'F號'];
+            userPalette = extracted.map((c, i) => ({
+              code: labels[i] || `P${i+1}`,
+              r: c.r, g: c.g, b: c.b
+            }));
+            renderPaletteUI();
+            alert(`✅ 成功辨識並為你的顏料盒編排了 ${userPalette.length} 個專屬代號！`);
+            if (originalImageData) analyzeColorsFromImageData(originalImageData);
+          }
         };
-        img.src = e.target.result;
+        img.src = event.target.result;
       };
       reader.readAsDataURL(file);
-    }
+    });
+
+    // 2. 載入寫生目標圖
+    imageLoader.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const img = new Image();
+        img.onload = () => {
+          canvas.width = img.width;
+          canvas.height = img.height;
+          ctx.drawImage(img, 0, 0);
+          originalImageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+          selectedPoint = null;
+          redrawCanvas();
+          analyzeColorsFromImageData(originalImageData);
+          resetZoomFit();
+        };
+        img.src = event.target.result;
+      };
+      reader.readAsDataURL(file);
+    });
 
     function redrawCanvas() {
-      if (!loadedImage) return;
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      ctx.fillStyle = '#ffffff';
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-      ctx.drawImage(loadedImage, 0, 0, canvas.width, canvas.height);
-    }
-
-    function clearCanvasColor() {
-      if (confirm('確定要清空已填上的色彩嗎？')) {
-        redrawCanvas();
+      if (!originalImageData) return;
+      if (isPosterized) {
+        renderPosterized();
+      } else {
+        ctx.putImageData(originalImageData, 0, 0);
+      }
+      
+      if (selectedPoint) {
+        ctx.save();
+        ctx.strokeStyle = '#ef4444';
+        ctx.lineWidth = Math.max(3, Math.round(canvas.width / 180));
+        ctx.beginPath();
+        ctx.arc(selectedPoint.x, selectedPoint.y, Math.max(10, Math.round(canvas.width / 60)), 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.fillStyle = '#ef4444';
+        ctx.beginPath();
+        ctx.arc(selectedPoint.x, selectedPoint.y, Math.max(4, Math.round(canvas.width / 200)), 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
       }
     }
 
-    // iPad / 電腦通用：點擊畫布幾何區塊塗上情緒色彩
-    function handleFill(e) {
-      if (!loadedImage) return alert('請先上傳拼貼原圖！');
-      if (e.type === 'touchstart') e.preventDefault();
-
-      const rect = canvas.getBoundingClientRect();
-      const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-      const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-
-      const scaleX = canvas.width / rect.width;
-      const scaleY = canvas.height / rect.height;
-
-      const x = (clientX - rect.left) * scaleX;
-      const y = (clientY - rect.top) * scaleY;
-
-      // 點擊塗上幾何情緒色塊
-      ctx.fillStyle = currentColor;
-      ctx.beginPath();
-      ctx.arc(x, y, 22, 0, Math.PI * 2);
-      ctx.fill();
+    function updateTransform() {
+      transformLayer.style.transform = `translate(${panX}px, ${panY}px) scale(${scale})`;
     }
 
-    canvas.addEventListener('click', handleFill);
-    canvas.addEventListener('touchstart', handleFill, { passive: false });
+    function resetZoomFit() {
+      if (!canvas.width || !canvas.height) return;
+      const wRatio = wrapper.clientWidth / canvas.width;
+      const hRatio = wrapper.clientHeight / canvas.height;
+      scale = Math.min(wRatio, hRatio) * 0.9;
+      panX = 0; panY = 0;
+      updateTransform();
+    }
 
-    // 下載填色後的 JPEG
-    function downloadColorCanvasJPEG() {
-      if (!loadedImage) return alert('請先上傳圖片並完成填色！');
-      const imageURI = canvas.toDataURL('image/jpeg', 0.95);
-      const link = document.createElement('a');
-      link.download = `畢卡索立體派_情緒色彩自畫像_${new Date().getTime()}.jpg`;
-      link.href = imageURI;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
+    document.getElementById('btnZoomIn').addEventListener('click', () => { scale *= 1.25; updateTransform(); });
+    document.getElementById('btnZoomOut').addEventListener('click', () => { scale /= 1.25; updateTransform(); });
+    document.getElementById('btnResetZoom').addEventListener('click', resetZoomFit);
+
+    wrapper.addEventListener('wheel', (e) => {
+      e.preventDefault();
+      scale *= e.deltaY < 0 ? 1.15 : 0.85;
+      updateTransform();
+    }, { passive: false });
+
+    wrapper.addEventListener('mousedown', (e) => {
+      isDragging = true; dragMoved = false;
+      startX = e.clientX - panX; startY = e.clientY - panY;
+    });
+
+    window.addEventListener('mousemove', (e) => {
+      if (!isDragging) return;
+      if (Math.abs(e.clientX - (startX + panX)) > 3 || Math.abs(e.clientY - (startY + panY)) > 3) dragMoved = true;
+      panX = e.clientX - startX; panY = e.clientY - startY;
+      updateTransform();
+    });
+
+    window.addEventListener('mouseup', () => { isDragging = false; });
+
+    canvas.addEventListener('click', (e) => {
+      if (dragMoved || !originalImageData) return;
+      const rect = canvas.getBoundingClientRect();
+      const x = Math.floor((e.clientX - rect.left) * (canvas.width / rect.width));
+      const y = Math.floor((e.clientY - rect.top) * (canvas.height / rect.height));
+
+      if (x < 0 || x >= canvas.width || y < 0 || y >= canvas.height) return;
+
+      selectedPoint = { x, y };
+      redrawCanvas();
+
+      const index = (y * canvas.width + x) * 4;
+      const r = originalImageData.data[index];
+      const g = originalImageData.data[index+1];
+      const b = originalImageData.data[index+2];
+
+      sampleSwatch.style.backgroundColor = `rgb(${r},${g},${b})`;
+      sampleRecipe.innerHTML = calculatePaletteDrops(r, g, b);
+    });
+
+    document.getElementById('btnOriginal').addEventListener('click', (e) => {
+      setActiveMode(e.target); isPosterized = false; redrawCanvas();
+    });
+
+    document.getElementById('btnPosterize').addEventListener('click', (e) => {
+      setActiveMode(e.target); isPosterized = true; redrawCanvas();
+    });
+
+    stepCountSelect.addEventListener('change', () => {
+      redrawCanvas();
+      if (originalImageData) analyzeColorsFromImageData(originalImageData);
+    });
+
+    function setActiveMode(activeBtn) {
+      document.querySelectorAll('.mode-btn').forEach(btn => btn.classList.remove('active'));
+      activeBtn.classList.add('active');
+    }
+
+    function renderPosterized() {
+      if (!originalImageData) return;
+      const K = parseInt(stepCountSelect.value);
+      const imgData = ctx.createImageData(originalImageData);
+      const src = originalImageData.data, dst = imgData.data;
+
+      for (let i = 0; i < src.length; i += 4) {
+        let gray = 0.299 * src[i] + 0.587 * src[i+1] + 0.114 * src[i+2];
+        let stepSize = 255 / (K - 1);
+        let quantized = Math.round(gray / stepSize) * stepSize;
+        dst[i] = quantized; dst[i+1] = quantized; dst[i+2] = quantized; dst[i+3] = 255;
+      }
+      ctx.putImageData(imgData, 0, 0);
+    }
+
+    // 核心演算法：將目標顏色與學生的個人顏料庫對接並計算滴數
+    function calculatePaletteDrops(targetR, targetG, targetB) {
+      if (!userPalette || userPalette.length === 0) return '請先上傳顏料盒相片';
+
+      // 尋找最接近目標色系的顏料代號
+      let closestP = userPalette[0];
+      let minDistance = Infinity;
+
+      userPalette.forEach(p => {
+        let dist = Math.abs(p.r - targetR) + Math.abs(p.g - targetG) + Math.abs(p.b - targetB);
+        if (dist < minDistance) {
+          minDistance = dist;
+          closestP = p;
+        }
+      });
+
+      let brightness = (0.299 * targetR + 0.587 * targetG + 0.114 * targetB) / 255;
+      let drops = [];
+
+      // 主要色彩對接
+      drops.push(`<div class="drop-item"><span class="code-tag">${closestP.code}</span> 顏料 2 滴</div>`);
+
+      // 根據明暗調校白色/黑色
+      let whiteP = userPalette.find(p => p.r > 200 && p.g > 200 && p.b > 200) || userPalette[3];
+      let blackP = userPalette.find(p => p.r < 50 && p.g < 50 && p.b < 50) || userPalette[4];
+
+      if (brightness > 0.5 && whiteP) {
+        drops.push(`<div class="drop-item"><span class="code-tag">${whiteP.code}</span> 顏料 2 滴</div>`);
+      } else if (brightness < 0.3 && blackP) {
+        drops.push(`<div class="drop-item"><span class="code-tag">${blackP.code}</span> 顏料 1 滴</div>`);
+      }
+
+      return drops.join('');
+    }
+
+    function analyzeColorsFromImageData(imgData) {
+      const K = parseInt(stepCountSelect.value);
+      stepsContainer.innerHTML = '';
+
+      const data = imgData.data;
+      const sampledColors = [];
+      const step = Math.floor((data.length / 4) / 300) * 4;
+
+      for (let i = 0; i < data.length; i += step) {
+        sampledColors.push({ r: data[i], g: data[i+1], b: data[i+2] });
+      }
+
+      const distinctColors = [];
+      for (let color of sampledColors) {
+        let isDifferent = distinctColors.every(c => Math.abs(c.r - color.r) + Math.abs(c.g - color.g) + Math.abs(c.b - color.b) > 110);
+        if (isDifferent) distinctColors.push(color);
+        if (distinctColors.length >= K) break;
+      }
+
+      while(distinctColors.length < K && sampledColors.length > 0) {
+        distinctColors.push(sampledColors[Math.floor(Math.random() * sampledColors.length)]);
+      }
+
+      distinctColors.forEach((color, idx) => {
+        let recipe = calculatePaletteDrops(color.r, color.g, color.b);
+        let stepEl = document.createElement('div');
+        stepEl.className = 'step-row';
+        stepEl.innerHTML = `
+          <div class="step-num">${idx + 1}</div>
+          <div class="step-swatch" style="background-color: rgb(${color.r},${color.g},${color.b});"></div>
+          <div class="step-recipe">${recipe}</div>
+        `;
+        stepsContainer.appendChild(stepEl);
+      });
     }
   </script>
 </body>
