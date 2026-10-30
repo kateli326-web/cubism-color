@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CYS VA 視藝科色彩輔助平台 (12色實體對接版)</title>
+  <title>CYS VA 視藝科色彩輔助平台 (12色專屬對接版)</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
     body { background-color: #f3f4f6; color: #1f2937; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
@@ -143,7 +143,7 @@
     let isDragging = false, startX, startY, dragMoved = false;
     let selectedPoint = null;
 
-    // 根據對照圖設定的 12 支顏料顏色參數
+    // 根據標註圖第 1 至 12 號顏料設定精準參數
     const userPalette = [
       { code: '①號', name: '檸檬黃', r: 245, g: 220, b: 0 },
       { code: '②號', name: '橘紅',   r: 240, g: 90,  b: 20 },
@@ -308,7 +308,6 @@
       ctx.putImageData(imgData, 0, 0);
     }
 
-    // 12 色精準比對演算法
     function calculatePaletteDrops(targetR, targetG, targetB) {
       let closestP = userPalette[0];
       let minDistance = Infinity;
