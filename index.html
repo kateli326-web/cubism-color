@@ -2,25 +2,30 @@
 <html lang="zh-HK">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CYS VA 視藝科色彩輔助平台 (學生自訂顏料版)</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>CYS VA 視藝色彩輔助平台 (圓形直徑標註版)</title>
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; touch-action: manipulation; }
     body { background-color: #f3f4f6; color: #1f2937; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
     header { background-color: #1e3a8a; color: white; padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-    header h1 { font-size: 1.2rem; font-weight: 600; }
+    header h1 { font-size: 1.1rem; font-weight: 600; }
     
-    .upload-group { display: flex; gap: 10px; }
-    .upload-btn { background-color: #3b82f6; color: white; padding: 8px 14px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 0.9rem; display: inline-flex; align-items: center; gap: 5px; }
+    .upload-group { display: flex; gap: 8px; }
+    .upload-btn { background-color: #3b82f6; color: white; padding: 8px 12px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 4px; }
     .upload-btn.secondary { background-color: #059669; }
     .upload-btn:hover { opacity: 0.9; }
     input[type="file"] { display: none; }
 
-    main { display: flex; flex: 1; padding: 15px; gap: 15px; overflow: hidden; }
+    main { display: flex; flex: 1; padding: 10px; gap: 10px; overflow: hidden; flex-direction: row; }
+    @media (max-width: 768px) {
+      main { flex-direction: column; overflow-y: auto; }
+      body { height: auto; overflow: auto; }
+      .viewport-container { height: 420px; }
+    }
 
-    .viewport-container { flex: 2; background: white; border-radius: 12px; padding: 15px; display: flex; flex-direction: column; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
-    .controls-bar { display: flex; gap: 8px; margin-bottom: 12px; align-items: center; flex-wrap: wrap; }
-    .mode-btn, .zoom-btn { padding: 6px 12px; border: 1px solid #d1d5db; background: #f9fafb; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.9rem; }
+    .viewport-container { flex: 2; background: white; border-radius: 12px; padding: 12px; display: flex; flex-direction: column; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
+    .controls-bar { display: flex; gap: 6px; margin-bottom: 8px; align-items: center; flex-wrap: wrap; }
+    .mode-btn, .zoom-btn { padding: 6px 10px; border: 1px solid #d1d5db; background: #f9fafb; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.85rem; }
     .mode-btn.active { background: #2563eb; color: white; border-color: #2563eb; }
 
     .canvas-wrapper { 
@@ -33,47 +38,56 @@
       display: flex;
       align-items: center;
       justify-content: center;
+      touch-action: none;
     }
     
     #canvasTransformLayer { position: absolute; transform-origin: center center; display: flex; align-items: center; justify-content: center; }
     canvas { cursor: crosshair !important; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
 
-    .sidebar { flex: 1; display: flex; flex-direction: column; gap: 15px; min-width: 340px; }
-    .card { background: white; border-radius: 12px; padding: 15px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
-    .card h2 { font-size: 1rem; color: #374151; margin-bottom: 10px; border-bottom: 2px solid #e5e7eb; padding-bottom: 6px; display: flex; justify-content: space-between; align-items: center; }
+    .sidebar { flex: 1; display: flex; flex-direction: column; gap: 10px; min-width: 320px; }
+    .card { background: white; border-radius: 12px; padding: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
+    .card h2 { font-size: 0.95rem; color: #374151; margin-bottom: 8px; border-bottom: 2px solid #e5e7eb; padding-bottom: 4px; display: flex; justify-content: space-between; align-items: center; }
 
-    .palette-grid { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 5px; }
-    .palette-badge { display: flex; align-items: center; gap: 6px; padding: 4px 8px; background: #f3f4f6; border: 1px solid #d1d5db; border-radius: 6px; font-weight: bold; font-size: 0.85rem; }
-    .badge-code { background: #1e3a8a; color: white; padding: 2px 6px; border-radius: 4px; font-family: monospace; }
-    .badge-swatch { width: 16px; height: 16px; border-radius: 50%; border: 1px solid #9ca3af; }
+    .palette-grid { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 5px; }
+    .palette-badge { display: flex; align-items: center; gap: 4px; padding: 4px 6px; background: #f3f4f6; border: 1px solid #d1d5db; border-radius: 6px; font-weight: bold; font-size: 0.8rem; }
+    .badge-code { background: #1e3a8a; color: white; padding: 2px 5px; border-radius: 4px; font-family: monospace; }
+    .badge-swatch { width: 14px; height: 14px; border-radius: 50%; border: 1px solid #9ca3af; }
 
-    .sampled-color-box { display: flex; align-items: center; gap: 15px; margin-bottom: 10px; }
-    .color-swatch { width: 50px; height: 50px; border-radius: 8px; border: 2px solid #374151; box-shadow: inset 0 2px 4px rgba(0,0,0,0.2); }
+    .sampled-color-box { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; }
+    .color-swatch { width: 48px; height: 48px; border-radius: 8px; border: 2px solid #374151; box-shadow: inset 0 2px 4px rgba(0,0,0,0.2); }
     .drops-list { display: flex; flex-direction: column; gap: 6px; flex: 1; }
-    .drop-item { display: flex; align-items: center; gap: 8px; font-size: 1rem; font-weight: bold; }
-    .code-tag { background: #1e3a8a; color: white; padding: 2px 8px; border-radius: 4px; font-family: monospace; font-size: 0.95rem; }
+    .drop-item { display: flex; align-items: center; gap: 6px; font-size: 0.85rem; font-weight: bold; }
+    .code-tag { background: #1e3a8a; color: white; padding: 2px 6px; border-radius: 4px; font-family: monospace; font-size: 0.8rem; }
+    
+    /* 直徑圓形圖示樣式 */
+    .size-circle { display: inline-block; border-radius: 50%; border: 1.5px solid #374151; background-color: #6b7280; vertical-align: middle; }
+    .size-lg { width: 18px; height: 18px; } /* 代表直徑 12mm (2份) */
+    .size-md { width: 13px; height: 13px; } /* 代表直徑 8mm (1份) */
+    .size-sm { width: 8px; height: 8px; }   /* 代表直徑 5mm (0.5份) */
 
-    .steps-container { display: flex; flex-direction: column; gap: 8px; max-height: calc(100vh - 380px); overflow-y: auto; }
-    .step-row { display: flex; align-items: center; gap: 10px; padding: 8px; background: #f9fafb; border-radius: 8px; border: 1px solid #e5e7eb; }
-    .step-num { font-weight: 800; font-size: 1.1rem; width: 28px; height: 28px; background: #1e3a8a; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-    .step-swatch { width: 36px; height: 36px; border-radius: 6px; border: 1px solid #d1d5db; flex-shrink: 0; }
-    .step-recipe { font-size: 0.9rem; font-weight: bold; color: #374151; flex: 1; }
+    .water-tip { font-size: 0.8rem; color: #0284c7; background: #e0f2fe; padding: 4px 8px; border-radius: 4px; margin-top: 4px; font-weight: bold; display: inline-block; }
 
-    .setup-banner { background: #dbeafe; color: #1e40af; padding: 8px 12px; border-radius: 6px; font-size: 0.85rem; font-weight: bold; margin-bottom: 8px; border: 1px solid #bfdbfe; display: flex; justify-content: space-between; align-items: center; }
-    .reset-btn { background: #ef4444; color: white; border: none; padding: 2px 8px; border-radius: 4px; cursor: pointer; font-size: 0.75rem; }
+    .steps-container { display: flex; flex-direction: column; gap: 6px; max-height: calc(100vh - 380px); overflow-y: auto; }
+    .step-row { display: flex; align-items: center; gap: 8px; padding: 6px; background: #f9fafb; border-radius: 6px; border: 1px solid #e5e7eb; }
+    .step-num { font-weight: 800; font-size: 0.95rem; width: 24px; height: 24px; background: #1e3a8a; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .step-swatch { width: 30px; height: 30px; border-radius: 6px; border: 1px solid #d1d5db; flex-shrink: 0; }
+    .step-recipe { font-size: 0.8rem; font-weight: bold; color: #374151; flex: 1; }
+
+    .setup-banner { background: #dbeafe; color: #1e40af; padding: 6px 10px; border-radius: 6px; font-size: 0.8rem; font-weight: bold; margin-bottom: 6px; border: 1px solid #bfdbfe; }
+    .reset-btn { background: #ef4444; color: white; border: none; padding: 2px 6px; border-radius: 4px; cursor: pointer; font-size: 0.75rem; }
   </style>
 </head>
 <body>
 
   <header>
-    <h1>🎨 CYS VA 視藝科色彩輔助平台 (學生自訂顏料對接版)</h1>
+    <h1>🎨 CYS VA 視藝色彩輔助平台</h1>
     <div class="upload-group">
       <label class="upload-btn secondary">
-        🎨 1. 上傳個人顏料照片
+        🎨 1. 上傳顏料照
         <input type="file" id="paletteLoader" accept="image/*">
       </label>
       <label class="upload-btn">
-        📷 2. 上傳寫生目標圖
+        📷 2. 上傳目標圖
         <input type="file" id="imageLoader" accept="image/*">
       </label>
     </div>
@@ -82,20 +96,19 @@
   <main>
     <div class="viewport-container">
       <div class="controls-bar">
-        <span id="currentViewTag" style="font-weight: bold; color: #059669;">請先上傳顏料相片並註冊代號</span>
+        <span id="currentViewTag" style="font-weight: bold; color: #059669; font-size: 0.85rem;">請先上傳顏料照並註冊代號</span>
         <button class="mode-btn active" id="btnOriginal">原圖</button>
-        <button class="mode-btn" id="btnPosterize">灰階等高線</button>
-        <span style="margin-left: 10px;">縮放：</span>
-        <button class="zoom-btn" id="btnZoomIn">🔍 放大</button>
-        <button class="zoom-btn" id="btnZoomOut">🔍 縮小</button>
-        <button class="zoom-btn" id="btnResetZoom">↺ 還原</button>
+        <button class="mode-btn" id="btnPosterize">等高線</button>
+        <button class="zoom-btn" id="btnZoomIn">放大</button>
+        <button class="zoom-btn" id="btnZoomOut">縮小</button>
+        <button class="zoom-btn" id="btnResetZoom">還原</button>
         
-        <div style="margin-left: auto; display: flex; align-items: center; gap: 6px;">
-          <label for="stepCount">提取主色：</label>
-          <select id="stepCount" style="padding: 4px 6px; font-weight: bold;">
-            <option value="3">3 色</option>
-            <option value="4">4 色</option>
-            <option value="5" selected>5 色</option>
+        <div style="margin-left: auto; display: flex; align-items: center; gap: 4px; font-size: 0.85rem;">
+          <label for="stepCount">提取：</label>
+          <select id="stepCount" style="padding: 2px 4px; font-weight: bold;">
+            <option value="3">3色</option>
+            <option value="4">4色</option>
+            <option value="5" selected>5色</option>
           </select>
         </div>
       </div>
@@ -106,16 +119,15 @@
         </div>
       </div>
 
-      <p style="font-size: 0.85rem; color: #6b7280; margin-top: 8px; text-align: center;" id="tipText">
-        💡 提示：上傳顏料盒相片後，在相片上順序點擊你的顏料，為它們加上代號！
+      <p style="font-size: 0.8rem; color: #6b7280; margin-top: 6px; text-align: center;" id="tipText">
+        💡 提示：配方會顯示顏料圖示與精準直徑（如：直徑 12mm），方便對照擠出！
       </p>
     </div>
 
     <div class="sidebar">
-      <!-- 學生專屬顏料庫對照卡 -->
       <div class="card">
         <h2>
-          🎨 學生個人顏料庫註冊
+          🎨 個人顏料庫註冊
           <button class="reset-btn" id="btnResetPalette">重新註冊</button>
         </h2>
         <div class="setup-banner" id="setupStatus">請上傳你的顏料相片開始註冊</div>
@@ -123,17 +135,17 @@
       </div>
 
       <div class="card">
-        <h2>📍 點選位置之專屬對接配方</h2>
+        <h2>📍 點選位置標準配方</h2>
         <div class="sampled-color-box">
           <div class="color-swatch" id="sampleSwatch" style="background-color: #e5e7eb;"></div>
           <div class="drops-list" id="sampleRecipe">
-            <span style="color: #6b7280;">請完成顏料註冊並上傳寫生圖...</span>
+            <span style="color: #6b7280; font-size: 0.85rem;">請完成註冊並點擊圖片取色...</span>
           </div>
         </div>
       </div>
 
       <div class="card" style="flex: 1;">
-        <h2>📊 全圖主流色彩卡 (個人代號版)</h2>
+        <h2>📊 全圖主流色彩卡 (直徑標註版)</h2>
         <div class="steps-container" id="stepsContainer"></div>
       </div>
     </div>
@@ -159,20 +171,19 @@
     let isPosterized = false;
     let paletteImageData = null;
     let targetImageData = null;
-    let viewMode = 'PALETTE'; // 'PALETTE' 或 'TARGET'
+    let viewMode = 'PALETTE';
 
     let scale = 1, panX = 0, panY = 0;
     let isDragging = false, startX, startY, dragMoved = false;
     let selectedPoint = null;
 
-    // 學生自訂顏料庫
     let userPalette = [];
     const codeAlphabet = ['A號', 'B號', 'C號', 'D號', 'E號', 'F號', 'G號', 'H號', 'I號', 'J號', 'K號', 'L號'];
 
     function renderPaletteUI() {
       paletteGrid.innerHTML = '';
       if (userPalette.length === 0) {
-        paletteGrid.innerHTML = '<span style="color:#6b7280; font-size:0.85rem;">尚未註冊顏料</span>';
+        paletteGrid.innerHTML = '<span style="color:#6b7280; font-size:0.8rem;">尚未註冊顏料</span>';
         return;
       }
       userPalette.forEach(p => {
@@ -199,7 +210,6 @@
       }
     });
 
-    // 1. 上傳個人顏料照片
     paletteLoader.addEventListener('change', (e) => {
       const file = e.target.files[0];
       if (!file) return;
@@ -214,9 +224,9 @@
           viewMode = 'PALETTE';
           userPalette = [];
           renderPaletteUI();
-          currentViewTag.innerText = '🔍 視口：學生顏料相片 (點擊顏色進行註冊)';
-          setupStatus.innerText = `👈 請點擊相片中【第 1 支顏料】的顏色，註冊為 A號`;
-          tipText.innerText = '💡 每點擊一次顏料管上的顏色，就會自動新增一個專屬代號 (A, B, C...)！';
+          currentViewTag.innerText = '🔍 視口：顏料照 (點擊顏色註冊)';
+          setupStatus.innerText = `👈 點擊【第 1 支顏料】顏色，註冊為 A號`;
+          tipText.innerText = '💡 每點一次顏料管上的顏色，就會新增一個專屬代號！';
           resetZoomFit();
         };
         img.src = event.target.result;
@@ -224,7 +234,6 @@
       reader.readAsDataURL(file);
     });
 
-    // 2. 上傳寫生目標圖
     imageLoader.addEventListener('change', (e) => {
       if (userPalette.length === 0) {
         alert('請先上傳顏料相片並至少點擊註冊 1 支顏料！');
@@ -241,8 +250,8 @@
           ctx.drawImage(img, 0, 0);
           targetImageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
           viewMode = 'TARGET';
-          currentViewTag.innerText = '🎨 視口：寫生目標圖 (取色對接中)';
-          tipText.innerText = '💡 點擊目標圖任意位置，平台會根據你註冊的顏料代號輸出調色配方！';
+          currentViewTag.innerText = '🎨 視口：寫生目標圖';
+          tipText.innerText = '💡 點擊目標圖任意位置，輸出直徑大小與水量建議！';
           selectedPoint = null;
           redrawCanvas();
           analyzeColorsFromImageData(targetImageData);
@@ -295,27 +304,43 @@
     document.getElementById('btnZoomOut').addEventListener('click', () => { scale /= 1.25; updateTransform(); });
     document.getElementById('btnResetZoom').addEventListener('click', resetZoomFit);
 
+    function getClientCoords(e) {
+      if (e.touches && e.touches.length > 0) {
+        return { clientX: e.touches[0].clientX, clientY: e.touches[0].clientY };
+      }
+      return { clientX: e.clientX, clientY: e.clientY };
+    }
+
+    function handleStart(e) {
+      isDragging = true; dragMoved = false;
+      const coords = getClientCoords(e);
+      startX = coords.clientX - panX; startY = coords.clientY - panY;
+    }
+
+    function handleMove(e) {
+      if (!isDragging) return;
+      const coords = getClientCoords(e);
+      if (Math.abs(coords.clientX - (startX + panX)) > 3 || Math.abs(coords.clientY - (startY + panY)) > 3) dragMoved = true;
+      panX = coords.clientX - startX; panY = coords.clientY - startY;
+      updateTransform();
+    }
+
+    function handleEnd() { isDragging = false; }
+
+    wrapper.addEventListener('mousedown', handleStart);
+    window.addEventListener('mousemove', handleMove);
+    window.addEventListener('mouseup', handleEnd);
+
+    wrapper.addEventListener('touchstart', handleStart, { passive: true });
+    window.addEventListener('touchmove', handleMove, { passive: true });
+    window.addEventListener('touchend', handleEnd);
+
     wrapper.addEventListener('wheel', (e) => {
       e.preventDefault();
       scale *= e.deltaY < 0 ? 1.15 : 0.85;
       updateTransform();
     }, { passive: false });
 
-    wrapper.addEventListener('mousedown', (e) => {
-      isDragging = true; dragMoved = false;
-      startX = e.clientX - panX; startY = e.clientY - panY;
-    });
-
-    window.addEventListener('mousemove', (e) => {
-      if (!isDragging) return;
-      if (Math.abs(e.clientX - (startX + panX)) > 3 || Math.abs(e.clientY - (startY + panY)) > 3) dragMoved = true;
-      panX = e.clientX - startX; panY = e.clientY - startY;
-      updateTransform();
-    });
-
-    window.addEventListener('mouseup', () => { isDragging = false; });
-
-    // 點擊畫布事件
     canvas.addEventListener('click', (e) => {
       if (dragMoved) return;
       const rect = canvas.getBoundingClientRect();
@@ -333,14 +358,12 @@
       const b = activeData.data[index+2];
 
       if (viewMode === 'PALETTE') {
-        // 註冊顏料色
         let nextCode = codeAlphabet[userPalette.length] || `P${userPalette.length+1}號`;
         userPalette.push({ code: nextCode, r, g, b });
         renderPaletteUI();
         let followingCode = codeAlphabet[userPalette.length] || `P${userPalette.length+1}號`;
-        setupStatus.innerText = `✅ 已註冊 ${nextCode}！可繼續點擊下一支註冊【${followingCode}】`;
+        setupStatus.innerText = `✅ 已註冊 ${nextCode}！繼續點擊註冊【${followingCode}】`;
       } else {
-        // 目標圖取色
         selectedPoint = { x, y };
         redrawCanvas();
         sampleSwatch.style.backgroundColor = `rgb(${r},${g},${b})`;
@@ -381,7 +404,7 @@
       ctx.putImageData(imgData, 0, 0);
     }
 
-    // 將目標色彩對接至學生註冊的個人顏料庫
+    // 直徑圖示與份量計算演算法
     function calculatePaletteDrops(targetR, targetG, targetB) {
       if (!userPalette || userPalette.length === 0) return '請先註冊個人顏料庫';
 
@@ -399,17 +422,46 @@
       let brightness = (0.299 * targetR + 0.587 * targetG + 0.114 * targetB) / 255;
       let drops = [];
 
-      drops.push(`<div class="drop-item"><span class="code-tag">${closestP.code}</span> 顏料 2 滴</div>`);
+      // 主顏料：大圓 (直徑 12mm)
+      drops.push(`
+        <div class="drop-item">
+          <span class="code-tag">${closestP.code}</span> 顏料：
+          <span class="size-circle size-lg" style="background-color: rgb(${closestP.r},${closestP.g},${closestP.b});"></span>
+          大圓 (直徑 12mm)
+        </div>
+      `);
 
-      // 搜尋學生註冊庫中的偏白/偏黑顏料進行明暗調節
       let whiteP = userPalette.find(p => p.r > 200 && p.g > 200 && p.b > 200);
       let blackP = userPalette.find(p => p.r < 60 && p.g < 60 && p.b < 60);
 
       if (brightness > 0.6 && whiteP && whiteP.code !== closestP.code) {
-        drops.push(`<div class="drop-item"><span class="code-tag">${whiteP.code}</span> 顏料 2 滴</div>`);
+        drops.push(`
+          <div class="drop-item">
+            <span class="code-tag">${whiteP.code}</span> 顏料：
+            <span class="size-circle size-md" style="background-color: rgb(${whiteP.r},${whiteP.g},${whiteP.b});"></span>
+            中圓 (直徑 8mm)
+          </div>
+        `);
       } else if (brightness < 0.25 && blackP && blackP.code !== closestP.code) {
-        drops.push(`<div class="drop-item"><span class="code-tag">${blackP.code}</span> 顏料 1 滴</div>`);
+        drops.push(`
+          <div class="drop-item">
+            <span class="code-tag">${blackP.code}</span> 顏料：
+            <span class="size-circle size-sm" style="background-color: rgb(${blackP.r},${blackP.g},${blackP.b});"></span>
+            小圓 (直徑 5mm)
+          </div>
+        `);
       }
+
+      let waterText = "";
+      if (brightness > 0.75) {
+        waterText = "💧 水量：多水 (薄塗/渲染感)";
+      } else if (brightness < 0.25) {
+        waterText = "💧 水量：少水 (濃稠覆蓋感)";
+      } else {
+        waterText = "💧 水量：適中 (濕潤牛奶狀)";
+      }
+
+      drops.push(`<div class="water-tip">${waterText}</div>`);
 
       return drops.join('');
     }
